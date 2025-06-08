@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PC Parts List Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background-color: #f4f4f4;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    input, select {
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+
+    tfoot td {
+      font-weight: bold;
+    }
+
+    button {
+      padding: 10px 15px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>PC Parts List Manager</h1>
+
+  <form id="partForm">
+    <input type="text" id="name" placeholder="Part Name" required>
+    <select id="category">
+      <option value="CPU">CPU</option>
+      <option value="GPU">GPU</option>
+      <option value="RAM">RAM</option>
+      <option value="Motherboard">Motherboard</option>
+      <option value="Storage">Storage</option>
+      <option value="PSU">PSU</option>
+      <option value="Case">Case</option>
+      <option value="Other">Other</option>
+    </select>
+    <input type="number" id="quantity" placeholder="Quantity" min="1" required>
+    <input type="number" id="unitCost" placeholder="Unit Cost" step="0.01" required>
+    
+    <!-- New Currency Selector -->
+    <select id="currency">
+      <option value="USD" selected>USD ($)</option>
+      <option value="EUR">EUR (€)</option>
+      <option value="GBP">GBP (£)</option>
+      <option value="JPY">JPY (¥)</option>
+      <option value="INR">INR (₹)</option>
+    </select>
+
+    <button type="submit">Add Part</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Part Name</th>
+        <th>Category</th>
+        <th>Quantity</th>
+        <th>Unit Cost</th>
+        <th>Total Cost</th>
+      </tr>
+    </thead>
+    <tbody id="partsTableBody"></tbody>
+    <tfoot>
+      <tr>
+        <td colspan="4">Grand Total</td>
+        <td id="grandTotal">$0.00</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <script>
+    const form = document.getElementById('partForm');
+    const tableBody = document.getElementById('partsTableBody');
+    const grandTotal = document.getElementById('grandTotal');
+    const currencySelector = document.getElementById('currency');
+
+    let total = 0;
+    let currentCurrency = currencySelector.value;
+
+    const currencySymbols = {
+      USD: "$",
+      EUR: "€",
+      GBP: "£",
+      JPY: "¥",
+      INR: "₹"
+    };
+
+    currencySelector.addEventListener('change', () => {
+      currentCurrency = currencySelector.value;
+      updateDisplayedCurrency();
+    });
+
+    function formatCurrency(amount) {
+      return `${currencySymbols[currentCurrency]}${amount.toFixed(2)}`;
+    }
+
+    function updateDisplayedCurrency() {
+      // Update all rows
+      const rows = tableBody.querySelectorAll('tr');
+      rows.forEach(row => {
+        const unitCostCell = row.children[3];
+        const totalCostCell = row.children[4];
+        const unitCost = parseFloat(unitCostCell.getAttribute('data-value'));
+        const totalCost = parseFloat(totalCostCell.getAttribute('data-value'));
+        unitCostCell.textContent = formatCurrency(unitCost);
+        totalCostCell.textContent = formatCurrency(totalCost);
+      });
+
+      // Update grand total
+      grandTotal.textContent = formatCurrency(total);
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const category = document.getElementById('category').value;
+      const quantity = parseInt(document.getElementById('quantity').value);
+      const unitCost = parseFloat(document.getElementById('unitCost').value);
+      const totalCost = quantity * unitCost;
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${name}</td>
+        <td>${category}</td>
+        <td>${quantity}</td>
+        <td data-value="${unitCost}">${formatCurrency(unitCost)}</td>
+        <td data-value="${totalCost}">${formatCurrency(totalCost)}</td>
+      `;
+
+      tableBody.appendChild(row);
+
+      total += totalCost;
+      grandTotal.textContent = formatCurrency(total);
+
+      form.reset();
+    });
+  </script>
+
+</body>
+</html>
