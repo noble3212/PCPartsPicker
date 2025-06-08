@@ -69,8 +69,8 @@
     </select>
     <input type="number" id="quantity" placeholder="Quantity" min="1" required>
     <input type="number" id="unitCost" placeholder="Unit Cost" step="0.01" required>
-    
-    <!-- New Currency Selector -->
+    <input type="url" id="partLink" placeholder="Part Link (URL)" required>
+
     <select id="currency">
       <option value="USD" selected>USD ($)</option>
       <option value="EUR">EUR (€)</option>
@@ -90,12 +90,13 @@
         <th>Quantity</th>
         <th>Unit Cost</th>
         <th>Total Cost</th>
+        <th>Link</th>
       </tr>
     </thead>
     <tbody id="partsTableBody"></tbody>
     <tfoot>
       <tr>
-        <td colspan="4">Grand Total</td>
+        <td colspan="5">Grand Total</td>
         <td id="grandTotal">$0.00</td>
       </tr>
     </tfoot>
@@ -128,7 +129,6 @@
     }
 
     function updateDisplayedCurrency() {
-      // Update all rows
       const rows = tableBody.querySelectorAll('tr');
       rows.forEach(row => {
         const unitCostCell = row.children[3];
@@ -139,7 +139,6 @@
         totalCostCell.textContent = formatCurrency(totalCost);
       });
 
-      // Update grand total
       grandTotal.textContent = formatCurrency(total);
     }
 
@@ -150,6 +149,7 @@
       const category = document.getElementById('category').value;
       const quantity = parseInt(document.getElementById('quantity').value);
       const unitCost = parseFloat(document.getElementById('unitCost').value);
+      const link = document.getElementById('partLink').value;
       const totalCost = quantity * unitCost;
 
       const row = document.createElement('tr');
@@ -159,6 +159,7 @@
         <td>${quantity}</td>
         <td data-value="${unitCost}">${formatCurrency(unitCost)}</td>
         <td data-value="${totalCost}">${formatCurrency(totalCost)}</td>
+        <td><a href="${link}" target="_blank">View</a></td>
       `;
 
       tableBody.appendChild(row);
